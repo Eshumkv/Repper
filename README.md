@@ -21,3 +21,17 @@ configuration.appSettings.add#key{something}#value = HolaMiFoute
 configuration.connectionStrings.add#name{FinancienNet_Financien}#connectionString = &replaceConn($value, "remappfitest\\sql")
 ```
 
+Functions will probably come in version 2.0. 
+
+# Wants
+
+## Replacing with Node
+For now it's only possible to replace something with a string. So for many replacings in a single node, you'd have a lot of work. Allow it to be replaced with a node. 
+
+## Adding 
+I really want a way to say to add a node (or attribute) if it doesn't exist with this value. Default it wouldn't do this, because that just seems silly. 
+
+The use case might be to add debugging info to a web.config. 
+
+# TODO
+
