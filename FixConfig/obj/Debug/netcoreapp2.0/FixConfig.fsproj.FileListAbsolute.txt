@@ -1,0 +1,7 @@
+c:\users\koenv\source\repos\FixConfig\FixConfig\bin\Debug\netcoreapp2.0\FixConfig.deps.json
+c:\users\koenv\source\repos\FixConfig\FixConfig\bin\Debug\netcoreapp2.0\FixConfig.runtimeconfig.json
+c:\users\koenv\source\repos\FixConfig\FixConfig\bin\Debug\netcoreapp2.0\FixConfig.runtimeconfig.dev.json
+c:\users\koenv\source\repos\FixConfig\FixConfig\bin\Debug\netcoreapp2.0\FixConfig.dll
+c:\users\koenv\source\repos\FixConfig\FixConfig\bin\Debug\netcoreapp2.0\FixConfig.pdb
+c:\users\koenv\source\repos\FixConfig\FixConfig\obj\Debug\netcoreapp2.0\FixConfig.dll
+c:\users\koenv\source\repos\FixConfig\FixConfig\obj\Debug\netcoreapp2.0\FixConfig.pdb
