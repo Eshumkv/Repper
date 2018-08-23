@@ -33,7 +33,7 @@ let main argv =
     //     |> serialize 
     //     |> fun x -> File.WriteAllText(outXmlFile, x)
 
-    "configuration.appSettings.add#key{GebruikersBeheerServerName}#value = remappfitest"
+    "configuration.appSettings.add#key{GebruikersBeheerServerName}#value = Server"
         |> getSelector
         |> serializeAndWrite
 
