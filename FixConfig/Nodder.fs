@@ -31,10 +31,10 @@ let rec fromXNodeList (nodes: XElement list): Nodder list =
     | [] -> []
     | node :: tail -> fromXNode(node) :: fromXNodeList(tail)
 
-let fromXDocument (node: XDocument): Nodder = 
-    let attributes = []
-    let l = fromXNodeList(List.ofSeq(Seq.tail(node.Descendants())))
-    Node(node.Root.Name.LocalName, attributes, l)
+let fromXDocument (doc: XDocument): Nodder = 
+    let attributes = getAttributes doc.Root
+    let l = fromXNodeList(List.ofSeq(Seq.tail(doc.Descendants())))
+    Node(doc.Root.Name.LocalName, attributes, l)
 
 let fromXml (path: string): Nodder = 
     fromXDocument(XDocument.Load(path))

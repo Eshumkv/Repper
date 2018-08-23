@@ -6,26 +6,52 @@ open System.IO
 // configuration.connectionStrings.add#name{FinancienNet_Financien}#connectionString = replaceConn($value, "remappfitest\\sql")
 
 
-type Attribute = string * string 
+type AttributeNode = string * string 
 type Selector = 
     | Node of string * Selector 
     | LeafNode of string 
-    | Attribute of Attribute * Attribute
+    | Attribute of AttributeNode * Selector
     | LeafAttribute of string
 
 type Repper = Selector * string
 
+let attributeSelector = '#'
+
 let getSelector (str: string): Selector = 
-    let rec getSelector_ (strings: string list): Selector = 
+    let createAttributeNode(attribute: string): AttributeNode = 
+        let split = attribute.Split('{')
+        let name = Array.head(split)
+        let value = Array.head(Array.head(Array.tail(split)).Split('}'))
+        AttributeNode(name, value)
+
+    let createNode(node: string): Selector = 
+        let node_split = Array.toList(node.Split(attributeSelector))
+        let attributes = node_split.Tail
+        let rec getAttributes (n: string list) = 
+            match n with 
+            | [] -> LeafAttribute "Invalid"
+            | attr :: attr_tail -> 
+                match attr_tail with 
+                | [] -> LeafAttribute attr
+                | _ -> Attribute(createAttributeNode(attr), getAttributes(attr_tail))
+        Node(node_split.Head, getAttributes(attributes))
+
+    let rec getSelector_ ((node :: tail): string list): Selector = 
+            match tail with 
+            | [] ->
+                match node.Contains(attributeSelector.ToString()) with 
+                | false -> LeafNode node 
+                | true -> createNode(node)
+            | _ -> Node(node, getSelector_(tail))
+
+    let validateArray(strings: string list): Selector = 
         match strings with 
         | [] -> LeafNode "Invalid"
-        | node :: tail -> 
-            match tail with 
-            | [] -> LeafNode node 
-            | _ -> Node(node, getSelector_(tail))
+        | _ -> getSelector_ strings
+
     str.Split('.')
         |> Array.toList
-        |> getSelector_
+        |> validateArray
 
 
 let testXml = 

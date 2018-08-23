@@ -26,8 +26,17 @@ let main argv =
         |> getOutputLines 
         |> WriteToFile
 
-    JsonConvert.SerializeObject(fromXml(xmlFile), Formatting.Indented) 
-        |> fun x -> File.WriteAllText(outXmlFile, x)
+    let serialize x = JsonConvert.SerializeObject(x, Formatting.Indented) 
+    let serializeAndWrite x = x |> serialize |> fun y -> File.WriteAllText(filename, y)
+    // xmlFile 
+    //     |> fromXml 
+    //     |> serialize 
+    //     |> fun x -> File.WriteAllText(outXmlFile, x)
 
+    "configuration.appSettings.add#key{GebruikersBeheerServerName}#value = remappfitest"
+        |> getSelector
+        |> serializeAndWrite
+
+    Console.ReadLine |> ignore 
     0 // return an integer exit code
 
