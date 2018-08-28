@@ -6,37 +6,93 @@ open System.IO
 open Nodder
 open Newtonsoft.Json
 
-let filename = @"C:\temp\fsharp.txt"
 let xmlFile = @"C:\temp\test.config"
 let outXmlFile = @"C:\temp\test_out.json"
 
-let WriteToFile input = 
-    File.WriteAllLines (filename, input) |> ignore
+let rec getReppers(contents: string list): Repper list = 
+    match contents with 
+        | [] -> []
+        | (line :: tail) -> getRepper(line) :: getReppers(tail)
 
-let getOutputLines (input: string) = 
-    input.Split("\n")
+let nodderTest = Nodder.Node("test", [], [Nodder.LeafNode("haha", "Gotcha", [])])
+let selectorTest = Selector.Node("test", Selector.LeafNode("haha"))
+let selectorTest2 = Selector.LeafNode("test")
 
-let getInput (filename: string) = 
-    filename.Replace("\r\n", "\n")
+let rec find(nodder: Nodder, selector: Selector): Nodder = 
+    let nameMatches x = nodderName(nodder) = x
+    let leafer name = 
+        match nameMatches(name) with  
+        | false -> InvalidNodder
+        | true -> nodder
+
+    let rec helper (nr, r) =
+        match nr with 
+        | [] -> InvalidNodder
+        | (node :: tail) -> 
+            match find(node, r) with 
+            | InvalidNodder -> helper (tail, r)
+            | x -> x
+
+    match selector with 
+    | Selector.InvalidNode -> nodder 
+    | Selector.Attribute(_) -> nodder
+    | Selector.Node(name, rest) -> 
+        match nameMatches(name) with 
+        | true -> 
+            match nodder with 
+            | Nodder.Node(name, _, nodderRest) -> helper(nodderRest, rest)
+            | _ -> InvalidNodder
+        | false -> InvalidNodder
+    | Selector.LeafNode(name) -> leafer(name)
+    | Selector.LeafAttribute(name) -> leafer(name)
+    
+let apply(selector: Selector): Nodder -> Nodder = 
+    fun x -> find(x, selector)
+
+let replace(nodder: Nodder, repper: Repper): Nodder = 
+    nodder
+        |> apply(fst repper)
+        |> setNodderValue(snd repper)
+
+
+let replaceAll (nodder: Nodder, reppers: Repper list): Nodder =
+    let foldFun nodder = fun repper -> replace(nodder, repper)
+    List.fold foldFun nodder reppers
 
 [<EntryPoint>]
 let main argv =
-    "Hello?\r\nIs it me you're looking for? "
-        |> getInput
-        |> getOutputLines 
-        |> WriteToFile
+    let serialize = fun x -> JsonConvert.SerializeObject(x, Formatting.Indented)
+    let serializeAndWriteToFile filename = 
+        serialize >> (fun y -> File.WriteAllText(filename, y))
+        
+    let filename = @"C:\temp\fsharp.txt"
+    let inFile = @""
+    let repperFile = @""
 
-    let serialize x = JsonConvert.SerializeObject(x, Formatting.Indented) 
-    let serializeAndWrite x = x |> serialize |> fun y -> File.WriteAllText(filename, y)
-    // xmlFile 
-    //     |> fromXml 
-    //     |> serialize 
-    //     |> fun x -> File.WriteAllText(outXmlFile, x)
+    //let nodder = 
+    //    inFile 
+    //        |> fromXml
+    // let reppers = 
+    //     repperFile 
+    //         |> File.ReadAllLines
+    //         |> Array.toList
+    //         |> getReppers
 
-    "configuration.appSettings.add#key{GebruikersBeheerServerName}#value = Server"
-        |> getSelector
-        |> serializeAndWrite
+    let repperTest = (selectorTest2, "Hello")
+    replaceAll (nodderTest, [repperTest])
+        |> serialize 
+        |> Console.WriteLine
 
-    Console.ReadLine |> ignore 
+    find(nodderTest, selectorTest2)
+        |> setNodderName("NIEUW!!")
+        |> serialize 
+        |> Console.WriteLine
+    
+    // "configuration.appSettings.add#key{GebruikersBeheerServerName}#value = Server"
+    //     |> getRepper
+    //     |> serializeAndWriteToFile filename
+
+    "Done" |> Console.WriteLine |> ignore
+    Console.ReadLine() |> ignore
     0 // return an integer exit code
 
