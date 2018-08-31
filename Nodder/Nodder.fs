@@ -36,7 +36,7 @@ module Helpers =
         let attributes = doc.Root |> getAttributes 
         let l = doc.Descendants() |> Seq.tail |> Seq.toList |> fromXNodeList
         let name = doc.Root.Name.LocalName 
-        Nodder (name, attributes, l)
+        Nodder (name, attributes, NodeValue (l))
 
     let name: Nodder -> Name = 
         fun nodder -> 

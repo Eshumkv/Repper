@@ -14,7 +14,7 @@ let rec getReppers(contents: string list): Repper list =
         | [] -> []
         | (line :: tail) -> getRepper(line) :: getReppers(tail)
 
-let nodderTest = Nodder.Node("test", [], [Nodder.LeafNode("haha", "Gotcha", [])])
+let nodderTest = Nodder("test", [], NodeValue [Nodder("haha", [], StringValue "Gotcha")])
 let selectorTest = Selector.Node("test", Selector.LeafNode("haha"))
 let selectorTest2 = Selector.LeafNode("test")
 
@@ -22,7 +22,7 @@ let rec find(nodder: Nodder, selector: Selector): Nodder =
     let nameMatches x = nodderName(nodder) = x
     let leafer name = 
         match nameMatches(name) with  
-        | false -> InvalidNodder
+        | false -> InvalidNode
         | true -> nodder
 
     let rec helper (nr, r) =
@@ -38,11 +38,8 @@ let rec find(nodder: Nodder, selector: Selector): Nodder =
     | Selector.Attribute(_) -> nodder
     | Selector.Node(name, rest) -> 
         match nameMatches(name) with 
-        | true -> 
-            match nodder with 
-            | Nodder.Node(name, _, nodderRest) -> helper(nodderRest, rest)
-            | _ -> InvalidNodder
-        | false -> InvalidNodder
+        | true -> helper((nodderValue nodder), selector)
+        | false -> InvalidNode
     | Selector.LeafNode(name) -> leafer(name)
     | Selector.LeafAttribute(name) -> leafer(name)
     
@@ -52,7 +49,7 @@ let apply(selector: Selector): Nodder -> Nodder =
 let replace(nodder: Nodder, repper: Repper): Nodder = 
     nodder
         |> apply(fst repper)
-        |> setNodderValue(snd repper)
+        |> setNodderValue(StringValue(snd repper))
 
 
 let replaceAll (nodder: Nodder, reppers: Repper list): Nodder =
